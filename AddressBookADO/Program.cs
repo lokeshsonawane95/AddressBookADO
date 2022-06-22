@@ -8,18 +8,20 @@
             Console.WriteLine("\t\t\t\t\tWelcome to Address Book Program using ADO");
             Console.WriteLine("1. Retrieve Contact Details from Database");
             Console.WriteLine("2. Update Contact Details in Database");
+            Console.WriteLine("3. Retrieve Contact Details in specific date range from Database");
             Console.Write("Enter your choice : ");
             int choice = Convert.ToInt32(Console.ReadLine());
             switch (choice)
             {
                 case 1:
                     addressBookOperations.RetrieveContactDetails();
-                    addressBookOperations.ReadList();
                     break;
                 case 2:
                     UpdateDatabase();
                     addressBookOperations.RetrieveContactDetails();
-                    addressBookOperations.ReadList();
+                    break;
+                case 3:
+                    addressBookOperations.RetrieveDetailsInSpecificDateRange();
                     break;
                 case 0:
                     return;

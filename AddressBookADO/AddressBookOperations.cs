@@ -14,10 +14,10 @@ namespace AddressBookADO
 
         SqlConnection connection = new SqlConnection(connectionString);
 
-        List<Details> contactDetails = new List<Details>();
-
         public void RetrieveContactDetails()
         {
+            List<Details> contactDetails = new List<Details>();
+
             try
             {
                 using (connection)
@@ -53,6 +53,10 @@ namespace AddressBookADO
                         reader.Close();
 
                         connection.Close();
+
+                        AddressBookOperations addressBookOperations = new AddressBookOperations();
+
+                        addressBookOperations.ReadList(contactDetails);
                     }
                     else
                     {
@@ -66,7 +70,7 @@ namespace AddressBookADO
             }
         }
 
-        public void ReadList()
+        public void ReadList(List<Details> contactDetails)
         {
             if (contactDetails.Count > 0)
             {
@@ -130,6 +134,57 @@ namespace AddressBookADO
             finally
             {
                 connection.Close();
+            }
+        }
+
+        public void RetrieveDetailsInSpecificDateRange()
+        {
+            List<Details> detailsList = new List<Details>();
+
+            try
+            {
+                using (connection)
+                {
+                    SqlCommand sqlCommand = new SqlCommand("select * from addressbook where dateadded between cast('2019-01-01' as date) and cast('2020-01-01' as date)", connection);
+
+                    connection.Open();
+
+                    SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+
+                    if (sqlDataReader.HasRows)
+                    {
+                        while (sqlDataReader.Read())
+                        {
+                            Details details = new Details();
+                            details.firstName = sqlDataReader.GetString(0);
+                            details.lastName = sqlDataReader.GetString(1);
+                            details.address = sqlDataReader.GetString(2);
+                            details.city = sqlDataReader.GetString(3);
+                            details.state = sqlDataReader.GetString(4);
+                            details.zip = sqlDataReader.GetInt32(5);
+                            details.phoneNo = sqlDataReader.GetInt64(6);
+                            details.eMail = sqlDataReader.GetString(7);
+
+                            detailsList.Add(details);
+                        }
+
+                        sqlDataReader.Close();
+
+                        connection.Close();
+
+                        AddressBookOperations addressBookOperations = new AddressBookOperations();
+
+                        addressBookOperations.ReadList(detailsList);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No records found");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
             }
         }
     }
