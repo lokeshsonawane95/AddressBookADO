@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Data;
 using System.Data.SqlClient;
 using System.Linq;
 using System.Text;
@@ -15,7 +16,7 @@ namespace AddressBookADO
 
         List<Details> contactDetails = new List<Details>();
 
-        public List<Details> RetrieveContactDetails()
+        public void RetrieveContactDetails()
         {
             try
             {
@@ -52,13 +53,10 @@ namespace AddressBookADO
                         reader.Close();
 
                         connection.Close();
-
-                        return contactDetails;
                     }
                     else
                     {
                         Console.WriteLine("No records");
-                        return null;
                     }
                 }
             }
@@ -93,6 +91,45 @@ namespace AddressBookADO
             else
             {
                 Console.WriteLine("No records");
+            }
+        }
+
+        public bool UpdateContactDetails(Details details)
+        {
+            try
+            {
+                using (connection)
+                {
+                    SqlCommand sqlCommand = new SqlCommand("SPUpdateContactDetails", connection);
+
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                    sqlCommand.Parameters.AddWithValue("@firstname", details.firstName);
+                    sqlCommand.Parameters.AddWithValue("@lastname", details.lastName);
+                    sqlCommand.Parameters.AddWithValue("@address", details.address);
+                    sqlCommand.Parameters.AddWithValue("@city", details.city);
+                    sqlCommand.Parameters.AddWithValue("@addressBookName", details.addressBookName);
+
+                    connection.Open();
+
+                    int result = sqlCommand.ExecuteNonQuery();
+
+                    connection.Close();
+
+                    if (result != 0)
+                    {
+                        return true;
+                    }
+                    return false;
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+            finally
+            {
+                connection.Close();
             }
         }
     }
