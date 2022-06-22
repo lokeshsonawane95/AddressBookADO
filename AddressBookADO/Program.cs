@@ -9,6 +9,7 @@
             Console.WriteLine("1. Retrieve Contact Details from Database");
             Console.WriteLine("2. Update Contact Details in Database");
             Console.WriteLine("3. Retrieve Contact Details in specific date range from Database");
+            Console.WriteLine("4. Retrieve Contact Details by city or state from Database");
             Console.Write("Enter your choice : ");
             int choice = Convert.ToInt32(Console.ReadLine());
             switch (choice)
@@ -22,6 +23,9 @@
                     break;
                 case 3:
                     addressBookOperations.RetrieveDetailsInSpecificDateRange();
+                    break;
+                case 4:
+                    addressBookOperations.RetrieveContanctsByCityOrState();
                     break;
                 case 0:
                     return;

@@ -187,5 +187,70 @@ namespace AddressBookADO
                 throw new Exception(e.Message);
             }
         }
+
+        public void RetrieveContanctsByCityOrState()
+        {
+            List<Details> detailsList = new List<Details>();
+
+            try
+            {
+                using (connection)
+                {
+                    Console.WriteLine("Want data according to\nPress 1 for City\nPress other number for State");
+                    Console.Write("Enter your choice : ");
+                    int choice = Convert.ToInt32(Console.ReadLine());
+                    Console.WriteLine();
+                    string query = "";
+                    if (choice == 1)
+                    {
+                        query = "select * from addressbook where city = 'Mumbai'";
+                    }
+                    else
+                    {
+                        query = "select * from addressbook where state = 'Maharashtra'";
+                    }
+
+                    SqlCommand sqlCommand = new SqlCommand(query, connection);
+
+                    connection.Open();
+
+                    SqlDataReader sqlDataReader = sqlCommand.ExecuteReader();
+
+                    if (sqlDataReader.HasRows)
+                    {
+                        while (sqlDataReader.Read())
+                        {
+                            Details details = new Details();
+                            details.firstName = sqlDataReader.GetString(0);
+                            details.lastName = sqlDataReader.GetString(1);
+                            details.address = sqlDataReader.GetString(2);
+                            details.city = sqlDataReader.GetString(3);
+                            details.state = sqlDataReader.GetString(4);
+                            details.zip = sqlDataReader.GetInt32(5);
+                            details.phoneNo = sqlDataReader.GetInt64(6);
+                            details.eMail = sqlDataReader.GetString(7);
+
+                            detailsList.Add(details);
+                        }
+
+                        sqlDataReader.Close();
+
+                        connection.Close();
+
+                        AddressBookOperations addressBookOperations = new AddressBookOperations();
+
+                        addressBookOperations.ReadList(detailsList);
+                    }
+                    else
+                    {
+                        Console.WriteLine("No records found");
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                throw new Exception(e.Message);
+            }
+        }
     }
 }
