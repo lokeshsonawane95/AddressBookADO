@@ -22,7 +22,7 @@ namespace AddressBookADO
             {
                 using (connection)
                 {
-                    SqlCommand sqlCommand = new SqlCommand("SPRetrieveContactDetails", connection);
+                    SqlCommand sqlCommand = new SqlCommand("select * from AddressBook", connection);
 
                     connection.Open();
 
@@ -33,19 +33,19 @@ namespace AddressBookADO
                         while (reader.Read())
                         {
                             Details details = new Details();
-                            details.contactID = reader.GetInt32(0);
-                            details.firstName = reader.GetString(1);
-                            details.lastName = reader.GetString(2);
-                            details.address = reader.GetString(3);
-                            details.city = reader.GetString(4);
-                            details.state = reader.GetString(5);
-                            details.zip = reader.GetInt32(6);
-                            details.phoneNo = reader.GetInt64(7);
-                            details.eMail = reader.GetString(8);
-                            details.addressBookNameId = reader.GetInt32(9);
+                            details.contactID = reader.GetInt32(8);
+                            details.firstName = reader.GetString(0);
+                            details.lastName = reader.GetString(1);
+                            details.address = reader.GetString(2);
+                            details.city = reader.GetString(3);
+                            details.state = reader.GetString(4);
+                            details.zip = reader.GetInt32(5);
+                            details.phoneNo = reader.GetInt64(6);
+                            details.eMail = reader.GetString(7);
+                            /*details.addressBookNameId = reader.GetInt32(9);
                             details.addressBookName = reader.GetString(10);
                             details.typeId = reader.GetInt32(11);
-                            details.typeName = reader.GetString(12);
+                            details.typeName = reader.GetString(12);*/
 
                             contactDetails.Add(details);
                         }
@@ -85,10 +85,10 @@ namespace AddressBookADO
                     Console.WriteLine("Zip : " + details.zip);
                     Console.WriteLine("Phone number : " + details.phoneNo);
                     Console.WriteLine("Email : " + details.eMail);
-                    Console.WriteLine("Address Book ID : " + details.addressBookNameId);
-                    Console.WriteLine("Address Book Name : " + details.addressBookName);
-                    Console.WriteLine("Type ID : " + details.typeId);
-                    Console.WriteLine("Type Name : " + details.typeName);
+                    //Console.WriteLine("Address Book ID : " + details.addressBookNameId);
+                    //Console.WriteLine("Address Book Name : " + details.addressBookName);
+                    //Console.WriteLine("Type ID : " + details.typeId);
+                    //Console.WriteLine("Type Name : " + details.typeName);
                     Console.WriteLine();
                 }
             }
@@ -250,6 +250,54 @@ namespace AddressBookADO
             catch (Exception e)
             {
                 throw new Exception(e.Message);
+            }
+        }
+
+        public bool InsertDataIntoTables(Details details)
+        {
+            List<Details> detailsList = new List<Details>();
+
+            try
+            {
+                using (connection)
+                {
+                    SqlCommand sqlCommand = new SqlCommand("SPInsertContactDetails", connection);
+
+                    sqlCommand.CommandType = CommandType.StoredProcedure;
+
+                    sqlCommand.Parameters.AddWithValue("@firstname", details.firstName);
+                    sqlCommand.Parameters.AddWithValue("@lastname", details.lastName);
+                    sqlCommand.Parameters.AddWithValue("@address", details.address);
+                    sqlCommand.Parameters.AddWithValue("@city", details.city);
+                    sqlCommand.Parameters.AddWithValue("@state", details.state);
+                    sqlCommand.Parameters.AddWithValue("@zip", details.zip);
+                    sqlCommand.Parameters.AddWithValue("@phonenumber", details.phoneNo);
+                    sqlCommand.Parameters.AddWithValue("@email", details.eMail);
+                    sqlCommand.Parameters.AddWithValue("@dateadded", details.dateAdded);
+                    sqlCommand.Parameters.AddWithValue("@addressbookname", details.addressBookName);
+                    connection.Open();
+
+                    int result = sqlCommand.ExecuteNonQuery();
+
+                    connection.Close();
+                    if (result != 0)
+                    {
+                        return true;
+                    }
+
+                    return false;
+                }
+
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+                return false;
+            }
+            finally
+            {
+                if (connection.State == ConnectionState.Open)
+                    connection.Close();
             }
         }
     }
