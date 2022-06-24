@@ -300,5 +300,26 @@ namespace AddressBookADO
                     connection.Close();
             }
         }
+
+        public void AddingMultipleContactDetailsUsingThreading(List<Details> contactDetails)
+        {
+            contactDetails.ForEach(contactData =>
+            {
+                
+                Thread thread = new Thread(()=>
+                {
+                    Console.WriteLine("Address being added" + contactData.firstName);
+                    InsertDataIntoTables(contactData);
+
+                    Console.WriteLine("Thread id: " + Thread.CurrentThread.ManagedThreadId);
+                    Console.WriteLine("Contact added:" + contactData.firstName);
+                });
+                
+                thread.Start();
+                
+                thread.Join();
+
+            });
+        }
     }
 }
