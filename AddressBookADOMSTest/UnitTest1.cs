@@ -87,5 +87,53 @@ namespace AddressBookADOMSTest
                 Console.WriteLine(response.Content);
             });
         }
+
+        [TestMethod]
+        public void givenContactDetail_updateInJsonServer_andDatabase()
+        {
+            Details contact = new Details();
+            contact.firstName = "Lokesh";
+            contact.lastName = "Sonawane";
+            contact.address = "Andheri";
+            contact.city = "Mumbai";
+            contact.state = "Maharashtra";
+            contact.zip = 411058;
+            contact.phoneNo = 9876543210;
+            contact.eMail = "lokesh.sonawane@gmail.com";
+            contact.addressBookName = "A";
+
+            
+            RestRequest request = new RestRequest("AddressBook/4", Method.PUT);
+            
+            JObject jObject = new JObject();
+            jObject.Add("firstName", contact.firstName);
+            jObject.Add("lastName", contact.lastName);
+            jObject.Add("address", contact.address);
+            jObject.Add("city", contact.city);
+            jObject.Add("state", contact.state);
+            jObject.Add("zip", contact.zip);
+            jObject.Add("phoneNo", contact.phoneNo);
+            jObject.Add("eMail", contact.eMail);
+            jObject.Add("addressBookName", contact.addressBookName);
+            
+            request.AddParameter("application/json", jObject, ParameterType.RequestBody);
+            
+            IRestResponse response = client.Execute(request);
+            
+            Assert.AreEqual(response.StatusCode, System.Net.HttpStatusCode.OK);
+            
+            Details dataResponse = JsonConvert.DeserializeObject<Details>(response.Content);
+            
+            Assert.AreEqual(dataResponse.address, "Andheri");
+            
+            Console.WriteLine(response.Content);
+
+            
+            AddressBookOperations addressBookOperations = new AddressBookOperations();
+            addressBookOperations.InsertDataIntoTables(contact);
+
+            Details expected = addressBookOperations.GettingUpdatedDetails(contact);
+            Assert.AreEqual(contact, expected);
+        }
     }
 }

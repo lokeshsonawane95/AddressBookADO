@@ -142,6 +142,64 @@ namespace AddressBookADO
             }
         }
 
+        public Details GettingUpdatedDetails(Details contact)
+        {
+            try
+            {
+                using (connection)
+                {
+                    string query = "Select a.firstname,a.lastname,a.address,a.city,a.state,a.zip,a.phonenumber,a.email,c.addressbookname from addressbook a join addressbookmapper b on a.contactid=b.contactid join addressbooknames c on c.addressbookid=b.addressbookid where a.firstname=@firstname and a.lastname=@lastname and c.addressbookname=@addressbookname";
+                    
+                    SqlCommand command = new SqlCommand(query, connection);
+                    command.Parameters.AddWithValue("@firstname", contact.firstName);
+                    command.Parameters.AddWithValue("@lastname", contact.lastName);
+                    command.Parameters.AddWithValue("@addressbookname", contact.addressBookName);
+                    connection.Open();
+                    
+                    SqlDataReader sqlDataReader = command.ExecuteReader();
+                    
+                    if (sqlDataReader.HasRows)
+                    {
+                        
+                        while (sqlDataReader.Read())
+                        {
+                            
+                            Details contactDetails = new Details();
+                            contactDetails.firstName = sqlDataReader.GetString(0);
+                            contactDetails.lastName = sqlDataReader.GetString(1);
+                            contactDetails.address = sqlDataReader.GetString(2);
+                            contactDetails.city = sqlDataReader.GetString(3);
+                            contactDetails.state = sqlDataReader.GetString(4);
+                            contactDetails.zip = sqlDataReader.GetInt32(5);
+                            contactDetails.phoneNo = sqlDataReader.GetInt64(6);
+                            contactDetails.eMail = sqlDataReader.GetString(7);
+                            contactDetails.addressBookName = sqlDataReader.GetString(8);
+                            
+                            
+                            return contactDetails;
+                        }
+
+                        sqlDataReader.Close();
+                        
+                        connection.Close();
+                        return null;
+                    }
+                    else
+                    {
+                        throw new Exception("No records");
+                    }
+                }
+            }
+            
+            catch (Exception ex)
+            {
+
+                Console.WriteLine(ex.Message);
+                return null;
+            }
+
+        }
+
         public void RetrieveDetailsInSpecificDateRange()
         {
             List<Details> detailsList = new List<Details>();
