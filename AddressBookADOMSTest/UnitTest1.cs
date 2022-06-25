@@ -1,4 +1,6 @@
 using AddressBookADO;
+using Newtonsoft.Json;
+using RestSharp;
 using System.Diagnostics;
 
 namespace AddressBookADOMSTest
@@ -6,6 +8,8 @@ namespace AddressBookADOMSTest
     [TestClass]
     public class UnitTest1
     {
+        RestClient client;
+
         [TestMethod]
         public void AddingMultipleContactsIntoDataBaseUsingThreading()
         {
@@ -23,6 +27,27 @@ namespace AddressBookADOMSTest
             addressBookOperations.AddingMultipleContactDetailsUsingThreading(contactDetails);
             stopwatch.Stop();
             Console.WriteLine("Elapsed Time: " + stopwatch.Elapsed);
+        }
+
+        [TestMethod]
+        public void onCallingGetApi_ReturnAddressBook()
+        {
+            
+            RestRequest request = new RestRequest("/AddressBook", Method.GET);
+            
+            IRestResponse response = client.Execute(request);
+            
+            Assert.AreEqual(response.StatusCode, System.Net.HttpStatusCode.OK);
+            
+            List<Details> dataResponse = JsonConvert.DeserializeObject<List<Details>>(response.Content);
+            
+            foreach (Details contactDetails in dataResponse)
+            {
+                Console.WriteLine("AddressBookName:- " + contactDetails.addressBookName + " First Name:- " + contactDetails.firstName + " Last Name:- " + contactDetails.lastName + " Address:- " + contactDetails.address + " City:- " + contactDetails.city + " State:- " + contactDetails.state + " Zip:- " + contactDetails.zip + " phone number:- " + contactDetails.phoneNo + " Email:- " + contactDetails.eMail + " Date:-" + contactDetails.dateAdded);
+            }
+            //adding data in database using threading
+            AddressBookOperations addressBookOperations = new AddressBookOperations();
+            addressBookOperations.AddingMultipleContactDetailsUsingThreading(dataResponse);
         }
     }
 }
