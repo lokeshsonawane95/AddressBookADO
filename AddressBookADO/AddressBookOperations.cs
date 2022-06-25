@@ -14,10 +14,10 @@ namespace AddressBookADO
 
         SqlConnection connection = new SqlConnection(connectionString);
 
+        List<Details> contactDetails = new List<Details>();
+
         public void RetrieveContactDetails()
         {
-            List<Details> contactDetails = new List<Details>();
-
             try
             {
                 using (connection)
@@ -68,6 +68,11 @@ namespace AddressBookADO
             {
                 throw new Exception(e.Message);
             }
+        }
+
+        public List<Details> ContactDetailsListMethod()
+        {
+            return contactDetails;
         }
 
         public void ReadList(List<Details> contactDetails)

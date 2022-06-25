@@ -1,5 +1,6 @@
 using AddressBookADO;
 using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
 using RestSharp;
 using System.Diagnostics;
 
@@ -48,6 +49,43 @@ namespace AddressBookADOMSTest
             //adding data in database using threading
             AddressBookOperations addressBookOperations = new AddressBookOperations();
             addressBookOperations.AddingMultipleContactDetailsUsingThreading(dataResponse);
+        }
+
+        [TestMethod]
+        public void givenContactDetail_OnPost_ShouldBeAddedInJsonServer()
+        {
+            
+            AddressBookOperations addressBookOperations = new AddressBookOperations();
+            
+            List<Details> contactDetails = addressBookOperations.ContactDetailsListMethod();
+            
+            contactDetails.ForEach(contact =>
+            {
+                
+                RestRequest request = new RestRequest("/AddressBook", Method.POST);
+                
+                JObject jObject = new JObject();
+                jObject.Add("firstName", contact.firstName);
+                jObject.Add("lastName", contact.lastName);
+                jObject.Add("address", contact.address);
+                jObject.Add("city", contact.city);
+                jObject.Add("state", contact.state);
+                jObject.Add("zip", contact.zip);
+                jObject.Add("phoneNo", contact.phoneNo);
+                jObject.Add("eMail", contact.eMail);
+                jObject.Add("addressBookName", contact.addressBookName);
+                
+                request.AddParameter("application/json", jObject, ParameterType.RequestBody);
+                
+                IRestResponse response = client.Execute(request);
+                
+                Assert.AreEqual(response.StatusCode, System.Net.HttpStatusCode.Created);
+                
+                Details dataResponse = JsonConvert.DeserializeObject<Details>(response.Content);
+                Assert.AreEqual(contact.firstName, dataResponse.firstName);
+                Assert.AreEqual(contact.phoneNo, dataResponse.phoneNo);
+                Console.WriteLine(response.Content);
+            });
         }
     }
 }
